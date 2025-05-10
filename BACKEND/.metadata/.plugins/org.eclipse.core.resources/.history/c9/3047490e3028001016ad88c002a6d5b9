@@ -1,0 +1,10 @@
+package com.pms.sdp.service;
+
+import com.pms.sdp.dto.RegisterRequest;
+import com.pms.sdp.dto.LoginRequest;
+import com.pms.sdp.dto.AuthResponse;
+
+public interface BuyerService {
+    AuthResponse registerBuyer(RegisterRequest request);
+    AuthResponse loginBuyer(LoginRequest request);
+}

@@ -1,0 +1,7 @@
+package com.pms.sdp.service;
+
+import com.pms.sdp.model.Admin;
+
+public interface AdminService {
+    String login(String email, String password);
+}

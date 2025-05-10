@@ -1,0 +1,11 @@
+package com.pms.sdp.repository;
+
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.pms.sdp.model.Buyer;
+
+public interface BuyerRepository extends JpaRepository<Buyer, Long> {
+    Optional<Buyer> findByEmail(String email);
+}

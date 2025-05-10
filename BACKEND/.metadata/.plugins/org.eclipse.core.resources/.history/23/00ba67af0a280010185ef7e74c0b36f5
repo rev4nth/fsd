@@ -1,0 +1,19 @@
+package com.pms.sdp.controller;
+
+import com.property.sdp.service.AdminService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/admin")
+@CrossOrigin
+public class AdminController {
+
+    @Autowired
+    private AdminService adminService;
+
+    @PostMapping("/login")
+    public String login(@RequestParam String email, @RequestParam String password) {
+        return adminService.login(email, password);
+    }
+}

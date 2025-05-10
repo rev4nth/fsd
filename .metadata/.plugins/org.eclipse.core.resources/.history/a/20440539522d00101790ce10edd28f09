@@ -1,0 +1,80 @@
+package com.example.propertymanagementsystem.service;
+
+import com.example.propertymanagementsystem.model.Booking;
+import com.example.propertymanagementsystem.model.BookingStatus;
+import com.example.propertymanagementsystem.model.Property;
+import com.example.propertymanagementsystem.model.User;
+import com.example.propertymanagementsystem.repository.BookingRepository;
+import com.example.propertymanagementsystem.repository.PropertyRepository;
+import com.example.propertymanagementsystem.repository.UserRepository;
+import com.example.propertymanagementsystem.security.JwtTokenProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+public class BookingService {
+
+    @Autowired
+    private BookingRepository bookingRepository;
+
+    @Autowired
+    private PropertyRepository propertyRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
+    @Transactional
+    public Booking createBooking(Booking booking, String token) {
+        String username = jwtTokenProvider.getUsernameFromToken(token.replace("Bearer ", ""));
+        User buyer = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Property property = propertyRepository.findById(booking.getProperty().getId())
+                .orElseThrow(() -> new RuntimeException("Property not found"));
+
+        booking.setBuyer(buyer);
+        booking.setProperty(property);
+        booking.setStatus(BookingStatus.PENDING);
+
+        return bookingRepository.save(booking);
+    }
+
+    public List<Booking> getBuyerBookings(String token) {
+        String username = jwtTokenProvider.getUsernameFromToken(token.replace("Bearer ", ""));
+        User buyer = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return bookingRepository.findByBuyerOrderByCreatedAtDesc(buyer);
+    }
+
+    public List<Booking> getSellerBookings(String token) {
+        String username = jwtTokenProvider.getUsernameFromToken(token.replace("Bearer ", ""));
+        User seller = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return bookingRepository.findByPropertySellerOrderByCreatedAtDesc(seller);
+    }
+
+    @Transactional
+    public Booking updateBookingStatus(Long bookingId, String status, String token) {
+        String username = jwtTokenProvider.getUsernameFromToken(token.replace("Bearer ", ""));
+        User seller = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        if (!booking.getProperty().getSeller().equals(seller)) {
+            throw new RuntimeException("Unauthorized to update this booking");
+        }
+
+        booking.setStatus(BookingStatus.valueOf(status));
+        return bookingRepository.save(booking);
+    }
+} 

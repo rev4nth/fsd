@@ -1,0 +1,36 @@
+spring.application.name=PropertyManagementSystem
+server.port=8080
+
+# JWT Configuration
+application.security.jwt.secret-key=404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+application.security.jwt.expiration=86400000
+
+# Database Configuration
+spring.datasource.url=jdbc:mysql://db4free.net:3306/pms_db1
+spring.datasource.username=revo_stay
+spring.datasource.password=YOUR_DB4FREE_PASSWORD
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=false
+spring.jpa.properties.hibernate.format_sql=false
+spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
+
+# Other configurations remain the same
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=2300090029csitelge@gmail.com
+spring.mail.password=qhvj lngk gpez kwsh
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+
+cloudinary.cloud_name=dyuqqcewv
+cloudinary.api_key=515121515438561
+cloudinary.api_secret=-W6iun_Y8SAcrmhtVLbwrPoyAxo
+
+# File Upload Configuration
+spring.servlet.multipart.max-file-size=10MB
+spring.servlet.multipart.max-request-size=10MB
+
+# Razorpay Configuration
+razorpay.key.id=rzp_test_vXVnFBJPBn8Llt
+razorpay.key.secret=UIegXWmEE6Kz5oImRe7bNWy0

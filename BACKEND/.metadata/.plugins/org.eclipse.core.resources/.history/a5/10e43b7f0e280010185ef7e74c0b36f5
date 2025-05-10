@@ -1,0 +1,68 @@
+package com.pms.sdp.service;
+
+import com.pms.sdp.dto.RegisterRequest;
+import com.pms.sdp.dto.LoginRequest;
+import com.pms.sdp.dto.AuthResponse;
+import com.pms.sdp.model.Buyer;
+import com.pms.sdp.repository.BuyerRepository;
+import com.pms.sdp.util.JwtUtil;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.*;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class BuyerServiceImpl implements BuyerService {
+
+    private final BuyerRepository buyerRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
+
+    @Override
+    public AuthResponse registerBuyer(RegisterRequest request) {
+        Buyer buyer = Buyer.builder()
+                .name(request.getName())
+                .username(request.getUsername())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .mobileno(request.getMobileno())
+                .location(request.getLocation())
+                .dob(request.getDob())
+                .build();
+
+        buyerRepository.save(buyer);
+
+        UserDetails userDetails = User.builder()
+                .username(buyer.getEmail())
+                .password(buyer.getPassword())
+                .roles("BUYER")
+                .build();
+
+        String token = jwtUtil.generateToken(userDetails);
+        return new AuthResponse(token);
+    }
+
+    @Override
+    public AuthResponse loginBuyer(LoginRequest request) {
+        authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+        );
+
+        Buyer buyer = buyerRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("Buyer not found"));
+
+        UserDetails userDetails = User.builder()
+                .username(buyer.getEmail())
+                .password(buyer.getPassword())
+                .roles("BUYER")
+                .build();
+
+        String token = jwtUtil.generateToken(userDetails);
+        return new AuthResponse(token);
+    }
+}

@@ -1,0 +1,21 @@
+package com.pms.sdp.controller;
+
+import com.pms.sdp.dto.LoginRequest;
+import com.pms.sdp.service.AdminService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/admin")
+@CrossOrigin
+public class AdminController {
+
+    @Autowired
+    private AdminService adminService;
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody LoginRequest request) {
+        return ResponseEntity.ok(adminService.login(request.getEmail(), request.getPassword()));
+    }
+
+}

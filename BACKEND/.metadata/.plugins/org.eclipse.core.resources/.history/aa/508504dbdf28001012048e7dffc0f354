@@ -1,0 +1,60 @@
+package com.pms.sdp.service;
+
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class EmailService {
+
+    private final JavaMailSender mailSender;
+    private final TemplateEngine templateEngine;
+    
+    @Value("${spring.mail.username}")
+    private String fromEmail;
+    
+    @Value("${application.name:RevStay}")
+    private String applicationName;
+    
+    /**
+     * Sends a welcome email to newly registered users
+     * @param toEmail recipient email address
+     * @param fullName recipient full name
+     * @param username recipient username
+     */
+    @Async
+    public void sendWelcomeEmail(String toEmail, String fullName, String username) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            
+            helper.setFrom(fromEmail, applicationName);
+            helper.setTo(toEmail);
+            helper.setSubject("Welcome to RevStay!");
+            
+            // Prepare the evaluation context for the template
+            Context context = new Context();
+            context.setVariable("fullName", fullName);
+            context.setVariable("username", username);
+            
+            // Process the template and send the email
+            String emailContent = templateEngine.process("welcome", context);
+            helper.setText(emailContent, true);
+            
+            mailSender.send(message);
+            log.info("Welcome email sent successfully to: {}", toEmail);
+        } catch (MessagingException | java.io.UnsupportedEncodingException e) {
+            log.error("Failed to send welcome email to: {}", toEmail, e);
+        }
+    }
+}

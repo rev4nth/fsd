@@ -1,0 +1,136 @@
+package com.pms.sdp.controller;
+
+import com.pms.sdp.model.Booking;
+import com.pms.sdp.service.BookingService;
+import lombok.RequiredArgsConstructor;
+
+import org.apache.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/api/bookings")
+@RequiredArgsConstructor
+public class BookingController {
+
+    private final BookingService bookingService;
+
+    /**
+     * Create a new booking (BUYER only)
+     */
+    @PostMapping("/property/{propertyId}")
+    @PreAuthorize("hasRole('BUYER')")
+    public ResponseEntity<Map<String, Object>> createBooking(
+            Authentication authentication,
+            @PathVariable Long propertyId,
+            @RequestBody Map<String, Object> bookingData
+    ) {
+        String username = authentication.getName();
+        Map<String, Object> response = bookingService.createBooking(username, propertyId, bookingData);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Update booking status (both BUYER and SELLER can update)
+     */
+    @PutMapping("/{bookingId}/status")
+    @PreAuthorize("hasAnyRole('BUYER', 'SELLER')")
+    public ResponseEntity<Map<String, Object>> updateBookingStatus(
+            Authentication authentication,
+            @PathVariable Long bookingId,
+            @RequestParam String status,
+            @RequestParam(required = false) String paymentId,
+            @RequestParam(required = false) String signature
+    ) {
+        String username = authentication.getName();
+        Map<String, Object> response = bookingService.updateBookingStatus(username, bookingId, status, paymentId, signature);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Get specific booking (with access control)
+     */
+    @GetMapping("/{bookingId}")
+    public ResponseEntity<Map<String, Object>> getBookingById(
+            Authentication authentication,
+            @PathVariable Long bookingId
+    ) {
+        String username = authentication.getName();
+        Map<String, Object> booking = bookingService.getBookingById(username, bookingId);
+        return ResponseEntity.ok(booking);
+    }
+
+    /**
+     * Get all bookings for buyer (BUYER only)
+     */
+    @GetMapping("/my")
+    @PreAuthorize("hasRole('BUYER')")
+    public ResponseEntity<List<Map<String, Object>>> getMyBookings(Authentication authentication) {
+        String username = authentication.getName();
+        List<Map<String, Object>> bookings = bookingService.getBuyerBookings(username);
+        return ResponseEntity.ok(bookings);
+    }
+    @GetMapping("/seller/summary")
+    @PreAuthorize("hasRole('SELLER')")
+    public ResponseEntity<Map<String, Object>> getSellerBookingSummary(Authentication authentication) {
+        String username = authentication.getName();
+        List<Map<String, Object>> bookings = bookingService.getSellerBookings(username);
+
+        long total = bookings.size();
+        long confirmed = bookings.stream().filter(b -> "CONFIRMED".equalsIgnoreCase((String)b.get("status"))).count();
+        long rejected = bookings.stream().filter(b -> "REJECTED".equalsIgnoreCase((String)b.get("status"))).count();
+        double revenue = bookings.stream()
+            .filter(b -> "CONFIRMED".equalsIgnoreCase((String)b.get("status")))
+            .mapToDouble(b -> {
+                Object amountObj = b.get("amount");
+                if (amountObj instanceof Number) return ((Number) amountObj).doubleValue();
+                try { return Double.parseDouble(amountObj.toString()); } catch (Exception e) { return 0.0; }
+            })
+            .sum();
+
+        Map<String, Object> summary = new HashMap<>();
+        summary.put("total", total);
+        summary.put("confirmed", confirmed);
+        summary.put("rejected", rejected);
+        summary.put("revenue", revenue);
+        return ResponseEntity.ok(summary);
+    }
+    /**
+     * Get all bookings for seller's properties (SELLER only)
+     */
+    @GetMapping("/seller")
+    @PreAuthorize("hasRole('SELLER')")
+    public ResponseEntity<List<Map<String, Object>>> getSellerBookings(Authentication authentication) {
+        String username = authentication.getName();
+        List<Map<String, Object>> bookings = bookingService.getSellerBookings(username);
+        return ResponseEntity.ok(bookings);
+    }
+
+    @PutMapping("/{id}/cancel")
+    public ResponseEntity<?> cancelBooking(@PathVariable Long id, Authentication authentication) {
+        // Find booking by id, check if user is allowed, set status to CANCELLED, save, return success
+        // Example implementation:
+        Optional<Booking> bookingOpt = bookingRepository.findById(id);
+        if (!bookingOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Booking not found");
+        }
+        Booking booking = bookingOpt.get();
+
+        // Optionally: check if the authenticated user is the owner of the booking
+        String username = authentication.getName();
+        if (!booking.getBuyer().getUsername().equals(username)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not allowed to cancel this booking");
+        }
+
+        booking.setStatus("CANCELLED");
+        bookingRepository.save(booking);
+        return ResponseEntity.ok("Booking cancelled successfully");
+    }
+}

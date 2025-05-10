@@ -1,0 +1,5 @@
+package com.pms.sdp.exception;
+
+public class AccessDeniedException {
+
+}

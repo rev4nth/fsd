@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment Page</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+    <h2>Complete Your Payment</h2>
+    <button onclick="makePayment()">Pay Now</button>
+
+    <script>
+        function makePayment() {
+            var options = {
+                "key": "rzp_test_BUuLdu7Kmd4bSH", // Your Razorpay Key ID
+                "amount": "4800000", // Amount in paise (48000 * 100)
+                "currency": "INR",
+                "name": "RevoStay",
+                "description": "Property Booking Payment",
+                "order_id": "order_QTH52n3gHJzLR3", // Your order ID
+                "handler": function (response){
+                    // After successful payment
+                    console.log("Payment ID: " + response.razorpay_payment_id);
+                    console.log("Order ID: " + response.razorpay_order_id);
+                    console.log("Signature: " + response.razorpay_signature);
+                    
+                    // You can now use these details to verify the payment
+                    alert("Payment successful! Payment ID: " + response.razorpay_payment_id);
+                },
+                "prefill": {
+                    "name": "Test User",
+                    "email": "test@example.com",
+                    "contact": "9999999999"
+                },
+                "theme": {
+                    "color": "#3399cc"
+                }
+            };
+            var rzp1 = new Razorpay(options);
+            rzp1.open();
+        }
+    </script>
+</body>
+</html> 

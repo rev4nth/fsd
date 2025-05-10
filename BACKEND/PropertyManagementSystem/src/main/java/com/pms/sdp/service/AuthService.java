@@ -1,0 +1,126 @@
+package com.pms.sdp.service;
+
+import com.pms.sdp.dto.AuthResponse;
+import com.pms.sdp.dto.LoginRequest;
+import com.pms.sdp.dto.RegisterRequest;
+import com.pms.sdp.model.AppUser;
+import com.pms.sdp.repository.UserRepository;
+import com.pms.sdp.util.JwtUtil;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class AuthService {
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
+    private final AuthenticationManager authenticationManager;
+    private final CloudinaryService cloudinaryService;
+    private final EmailService emailService;
+
+    public AuthResponse register(RegisterRequest request) {
+        // Validate request
+        if (userRepository.existsByUsername(request.getUsername())) {
+            return AuthResponse.builder()
+                    .success(false)
+                    .message("Username already exists")
+                    .build();
+        }
+
+        if (userRepository.existsByEmail(request.getEmail())) {
+            return AuthResponse.builder()
+                    .success(false)
+                    .message("Email already exists")
+                    .build();
+        }
+
+        // Create new user
+        var user = new AppUser();
+        user.setUsername(request.getUsername());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setFullName(request.getFullName());
+        user.setEmail(request.getEmail());
+        user.setRole(request.getRole());
+        user.setPhone(request.getPhone());
+        user.setAddress(request.getAddress());
+        user.setCreatedDate(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+        user.setCreatedBy("SYSTEM");
+        user.setActive(true);
+
+        // Handle profile image upload if provided
+        MultipartFile profileImage = request.getProfileImage();
+        if (profileImage != null && !profileImage.isEmpty()) {
+            String imageUrl = cloudinaryService.uploadImage(profileImage);
+            if (imageUrl != null) {
+                user.setProfileImageUrl(imageUrl);
+                log.info("Profile image uploaded for user: {}", request.getUsername());
+            } else {
+                log.warn("Failed to upload profile image for user: {}", request.getUsername());
+            }
+        }
+
+        userRepository.save(user);
+
+        // Generate JWT token
+        var token = jwtUtil.generateToken(user.getUsername(), user.getRole());
+        
+        // Send welcome email asynchronously
+        emailService.sendWelcomeEmail(user.getEmail(), user.getFullName(), user.getUsername());
+        log.info("Welcome email notification queued for user: {}", user.getUsername());
+
+        return AuthResponse.builder()
+                .token(token)
+                .username(user.getUsername())
+                .role(user.getRole())
+                .fullName(user.getFullName())
+                .success(true)
+                .message("User registered successfully")
+                .build();
+    }
+
+    public AuthResponse login(LoginRequest request) {
+        try {
+            // Authenticate user
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getUsername(),
+                            request.getPassword()
+                    )
+            );
+
+            // Get user details
+            var user = userRepository.findByUsername(request.getUsername())
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+            // Generate JWT token
+            var token = jwtUtil.generateToken(user.getUsername(), user.getRole());
+
+            return AuthResponse.builder()
+                    .token(token)
+                    .username(user.getUsername())
+                    .role(user.getRole())
+                    .fullName(user.getFullName())
+                    .success(true)
+                    .message("Login successful")
+                    .build();
+                    
+        } catch (Exception e) {
+            return AuthResponse.builder()
+                    .success(false)
+                    .message("Invalid username or password")
+                    .build();
+        }
+    }
+}

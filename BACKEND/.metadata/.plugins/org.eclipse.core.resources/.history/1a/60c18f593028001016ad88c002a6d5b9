@@ -1,0 +1,15 @@
+spring.application.name=PropertyManagementSystem
+server.port=2509
+
+jwt.secret.key=R5gV3zF2JkH1pDkR2y1Y8sA7u9BmQ3J7zT9fV6eF1K5rL7q
+
+
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.datasource.url=jdbc:mysql://localhost:3306/pmsdb
+spring.datasource.username=root
+spring.datasource.password=90029
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect

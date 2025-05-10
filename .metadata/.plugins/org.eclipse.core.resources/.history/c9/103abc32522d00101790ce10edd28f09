@@ -1,0 +1,17 @@
+package com.example.propertymanagementsystem.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.example.propertymanagementsystem.model.Property;
+import com.example.propertymanagementsystem.model.User;
+
+@Repository
+public interface PropertyRepository extends JpaRepository<Property, Long> {
+    List<Property> findBySellerOrderByCreatedAtDesc(User seller);
+    List<Property> findByPropertyType(String propertyType);
+    List<Property> findByLocationContainingIgnoreCase(String location);
+    List<Property> findByPriceBetween(Double minPrice, Double maxPrice);
+} 

@@ -1,0 +1,7 @@
+package com.property.sdp.service;
+
+import com.property.sdp.model.Admin;
+
+public interface AdminService {
+    String login(String email, String password);
+}

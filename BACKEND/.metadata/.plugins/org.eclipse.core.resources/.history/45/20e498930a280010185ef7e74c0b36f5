@@ -1,0 +1,27 @@
+package com.pms.sdp.serviceImpl;
+
+import com.pms.sdp.model.Admin;
+import com.pms.sdp.repository.AdminRepository;
+import com.pms.sdp.service.AdminService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class AdminServiceImpl implements AdminService {
+
+    @Autowired
+    private AdminRepository adminRepository;
+
+    @Override
+    public String login(String email, String password) {
+        Admin admin = adminRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Admin not found"));
+
+        if (!admin.getPassword().equals(password)) {
+            throw new RuntimeException("Invalid password");
+        }
+
+        // Replace with JWT generation later
+        return "Login successful for admin: " + admin.getEmail();
+    }
+}

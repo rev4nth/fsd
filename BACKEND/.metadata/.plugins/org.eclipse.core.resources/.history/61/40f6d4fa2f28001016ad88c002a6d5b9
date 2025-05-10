@@ -1,0 +1,45 @@
+package com.pms.sdp.service;
+
+import com.pms.sdp.model.Admin;
+import com.pms.sdp.model.Buyer;
+import com.pms.sdp.repository.AdminRepository;
+import com.pms.sdp.repository.BuyerRepository;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.*;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+public class AppUserDetailsService implements UserDetailsService {
+
+    private final AdminRepository adminRepository;
+    private final BuyerRepository buyerRepository;
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Optional<Admin> admin = adminRepository.findByEmail(email);
+        if (admin.isPresent()) {
+            Admin a = admin.get();
+            return User.builder()
+                    .username(a.getEmail())
+                    .password(a.getPassword())
+                    .roles("ADMIN")
+                    .build();
+        }
+
+        Optional<Buyer> buyer = buyerRepository.findByEmail(email);
+        if (buyer.isPresent()) {
+            Buyer b = buyer.get();
+            return User.builder()
+                    .username(b.getEmail())
+                    .password(b.getPassword())
+                    .roles("BUYER")
+                    .build();
+        }
+
+        throw new UsernameNotFoundException("User not found with email: " + email);
+    }
+}

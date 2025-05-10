@@ -1,0 +1,16 @@
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+@Override
+public String login(String email, String password) {
+    Admin admin = adminRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("Admin not found"));
+
+    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+    if (!encoder.matches(password, admin.getPassword())) {
+        throw new RuntimeException("Invalid password");
+    }
+
+    // Replace with JWT generation later
+    return "Login successful for admin: " + admin.getEmail();
+}
