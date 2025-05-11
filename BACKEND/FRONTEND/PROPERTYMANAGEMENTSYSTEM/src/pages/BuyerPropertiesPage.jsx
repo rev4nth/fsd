@@ -24,7 +24,7 @@ const BuyerPropertiesPage = () => {
 
   const fetchProperties = async () => {
     try {
-      const response = await axios.get('http://localhost:2509/api/public/properties');
+      const response = await axios.get('http://https://property-i3v1.onrender.com:2509/api/public/properties');
       setProperties(response.data);
       setLoading(false);
     } catch (error) {
@@ -50,7 +50,7 @@ const BuyerPropertiesPage = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.post(
-        'http://localhost:2509/api/bookings',
+        'http://https://property-i3v1.onrender.com:2509/api/bookings',
         {
           propertyId: selectedProperty.id,
           visitDate: bookingData.visitDate,
