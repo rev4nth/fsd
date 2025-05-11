@@ -12,7 +12,7 @@ const MyBookings = () => {
     const fetchBookings = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://https://property-i3v1.onrender.com:2509/api/bookings/my', {
+        const response = await axios.get('https://fsd-jz2r.onrender.com/api/bookings/my', {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -41,7 +41,7 @@ const MyBookings = () => {
       
       // First get a fresh order from the backend
       const orderResponse = await axios.post(
-        `http://https://property-i3v1.onrender.com:2509/api/payments/create-order?amount=${Number(booking.amount).toFixed(2)}&currency=INR`,
+        `https://fsd-jz2r.onrender.com/api/payments/create-order?amount=${Number(booking.amount).toFixed(2)}&currency=INR`,
         {},
         {
           headers: {
@@ -87,7 +87,7 @@ const MyBookings = () => {
           try {
             // Update booking status with payment details
             const updateResponse = await axios.put(
-              `http://https://property-i3v1.onrender.com:2509/api/bookings/${booking.id}/status`,
+              `https://fsd-jz2r.onrender.com/api/bookings/${booking.id}/status`,
               {
                 status: 'CONFIRMED',
                 paymentId: response.razorpay_payment_id,
@@ -133,7 +133,7 @@ const MyBookings = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.put(
-        `http://https://property-i3v1.onrender.com:2509/api/bookings/${bookingId}/status`,
+        `https://fsd-jz2r.onrender.com/api/bookings/${bookingId}/status`,
         { status: 'COMPLETED' },
         {
           headers: {
@@ -155,7 +155,7 @@ const MyBookings = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.put(
-        `http://https://property-i3v1.onrender.com:2509/api/bookings/${bookingId}/cancel`,
+        `https://fsd-jz2r.onrender.com/api/bookings/${bookingId}/cancel`,
         {},
         {
           headers: {
