@@ -1,11 +1,11 @@
-# Build stage
+# 🏗️ Build stage
 FROM maven:3.9.5-openjdk-21 AS build
 WORKDIR /app
-COPY pom.xml . 
+COPY pom.xml .
 COPY src ./src
 RUN mvn clean package -DskipTests
 
-# Runtime stage
+# 🚀 Runtime stage
 FROM openjdk:21-alpine
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
