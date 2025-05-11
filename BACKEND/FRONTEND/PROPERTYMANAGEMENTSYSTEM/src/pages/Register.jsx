@@ -101,7 +101,7 @@ const Register = () => {
         formDataToSend.append('profileImage', formData.profileImage);
       }
       
-      const response = await axios.post('http://localhost:2509/api/auth/register', formDataToSend, {
+      const response = await axios.post('http://https://property-i3v1.onrender.com:2509/api/auth/register', formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
