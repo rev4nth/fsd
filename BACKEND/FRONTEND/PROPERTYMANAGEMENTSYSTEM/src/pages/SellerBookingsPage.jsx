@@ -29,7 +29,7 @@ const SellerBookingsPage = () => {
         navigate('/login');
         return;
       }
-      const response = await axios.get('http://localhost:2509/api/bookings/seller', {
+      const response = await axios.get('http://https://property-i3v1.onrender.com:2509/api/bookings/seller', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -57,7 +57,7 @@ const SellerBookingsPage = () => {
         return;
       }
       const response = await axios.put(
-        `http://localhost:2509/api/bookings/${bookingId}/status?status=${status}`,
+        `http://https://property-i3v1.onrender.com:2509/api/bookings/${bookingId}/status?status=${status}`,
         {},
         {
           headers: {
