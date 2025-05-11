@@ -35,7 +35,7 @@ const BuyerHome = () => {
 
   const fetchProperties = async () => {
     try {
-      const response = await axios.get('http://localhost:2509/api/public/properties');
+      const response = await axios.get('http://https://property-i3v1.onrender.com:2509/api/public/properties');
       setProperties(response.data);
       setLoading(false);
     } catch (error) {
@@ -90,7 +90,7 @@ const BuyerHome = () => {
 
       // First create the booking
       const response = await axios.post(
-        `http://localhost:2509/api/bookings/property/${selectedProperty.id}`,
+        `http://https://property-i3v1.onrender.com:2509/api/bookings/property/${selectedProperty.id}`,
         {
           visitDate: bookingData.visitDate,
           message: bookingData.message,
@@ -121,7 +121,7 @@ const BuyerHome = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.put(
-        `http://localhost:2509/api/bookings/${bookingId}/cancel`,
+        `http://https://property-i3v1.onrender.com:2509/api/bookings/${bookingId}/cancel`,
         {},
         {
           headers: {
