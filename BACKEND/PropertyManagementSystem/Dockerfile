@@ -1,10 +1,12 @@
-FROM maven:3.9.5-amazoncorretto-21 AS build
+# Build stage
+FROM maven:3.9.5-openjdk-21 AS build
 WORKDIR /app
-COPY pom.xml .
+COPY pom.xml . 
 COPY src ./src
 RUN mvn clean package -DskipTests
 
-FROM amazoncorretto:21-alpine
+# Runtime stage
+FROM openjdk:21-alpine
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
