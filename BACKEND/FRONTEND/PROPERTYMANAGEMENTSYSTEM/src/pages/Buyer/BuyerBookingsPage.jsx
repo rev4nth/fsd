@@ -12,7 +12,7 @@ const BuyerBookingsPage = () => {
     const fetchBookings = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://https://property-i3v1.onrender.com:2509/api/bookings/my', {
+        const response = await axios.get('https://fsd-jz2r.onrender.com/api/bookings/my', {
           headers: {
             Authorization: `Bearer ${token}`
           }
