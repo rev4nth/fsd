@@ -33,7 +33,7 @@ const BuyerBookingsPage = () => {
   const handleCancelBooking = async (bookingId) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`http://https://property-i3v1.onrender.com:2509/api/bookings/${bookingId}/cancel`, {}, {
+      await axios.put(`https://fsd-jz2r.onrender.com/api/bookings/${bookingId}/cancel`, {}, {
         headers: {
           Authorization: `Bearer ${token}`
         }
