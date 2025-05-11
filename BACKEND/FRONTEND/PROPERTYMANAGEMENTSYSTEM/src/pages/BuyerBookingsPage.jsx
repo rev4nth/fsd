@@ -51,7 +51,7 @@ const BuyerBookingsPage = () => {
       }
 
       console.log('Fetching bookings...');
-      const response = await axios.get('http://localhost:2509/api/bookings/my', {
+      const response = await axios.get('http://https://property-i3v1.onrender.com:2509/api/bookings/my', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -128,7 +128,7 @@ const BuyerBookingsPage = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.put(
-        `http://localhost:2509/api/bookings/${bookingId}/status?status=CANCELLED`,
+        `http://https://property-i3v1.onrender.com:2509/api/bookings/${bookingId}/status?status=CANCELLED`,
         {},
         {
           headers: {
