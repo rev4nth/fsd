@@ -11,7 +11,7 @@ const AdminEditPropertyPage = () => {
   useEffect(() => {
     const fetchProperty = async () => {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`http://https://property-i3v1.onrender.com:2509/api/properties/${id}`, {
+      const response = await axios.get(`https://fsd-jz2r.onrender.com/api/properties/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setFormData(response.data);
