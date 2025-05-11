@@ -12,7 +12,7 @@ const AdminPropertiesPage = () => {
     const fetchProperties = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:2509/api/properties', {
+        const response = await axios.get('http://https://property-i3v1.onrender.com:2509/api/properties', {
           headers: { Authorization: `Bearer ${token}` }
         });
         setProperties(response.data);
