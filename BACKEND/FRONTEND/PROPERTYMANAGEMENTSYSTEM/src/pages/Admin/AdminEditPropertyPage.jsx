@@ -27,7 +27,7 @@ const AdminEditPropertyPage = () => {
   const handleSubmit = async e => {
     e.preventDefault();
     const token = localStorage.getItem('token');
-    await axios.put(`http://https://property-i3v1.onrender.com:2509/api/properties/${id}`, formData, {
+    await axios.put(`https://fsd-jz2r.onrender.com/api/properties/${id}`, formData, {
       headers: { Authorization: `Bearer ${token}` }
     });
     navigate('/admin/properties');
